@@ -11,6 +11,9 @@ const hbs = exphbs.create({
   /* config */
 });
 
+const notes = require("./routes/notes");
+const users = require("./routes/users");
+
 //Map global promise - get rid of warning
 mongoose.Promise = global.Promise;
 //Connect to mongoose
@@ -23,10 +26,6 @@ mongoose
     console.log("MongoDB Connected.");
   })
   .catch(err => console.log(err));
-
-///Load Idea Model
-require("./models/Idea");
-const Idea = mongoose.model("ideas");
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -77,78 +76,11 @@ app.get("/about", (req, res) => {
   res.render("about");
 });
 
-//Process Form
-app.post("/ideas", (req, res) => {
-  let errors = [];
-  console.log(req.body);
-  if (!req.body.title) {
-    errors.push({ text: "Please add a title" });
-  }
+//Use Notes routes
+app.use("/notes", notes);
 
-  if (!req.body.details) {
-    errors.push({ text: "Please add some details" });
-  }
-
-  if (errors.length > 0) {
-    res.render("ideas/add", {
-      errors: errors,
-      title: req.body.title,
-      details: req.body.details
-    });
-  } else {
-    //res.send("Success");
-    const newUser = {
-      title: req.body.title,
-      detail: req.body.details
-    };
-    new Idea(newUser).save().then(() => {
-      req.flash("success_msg", "Note added");
-      res.redirect("/ideas");
-    });
-  }
-});
-
-app.get("/ideas", (req, res) => {
-  Idea.find({})
-    .sort({ date: "desc" })
-    .then(ideas => {
-      console.log(ideas);
-      res.render("ideas/index", {
-        ideas: ideas
-      });
-    });
-});
-
-// Add Idea Form
-app.get("/ideas/add", (req, res) => {
-  res.render("ideas/add");
-});
-
-// Edit Idea Form
-app.get("/ideas/edit/:id", (req, res) => {
-  Idea.findOne({
-    _id: req.params.id
-  }).then(idea => {
-    console.log(idea);
-    res.render("ideas/edit", {
-      idea: idea
-    });
-  });
-});
-
-// Delete Idea
-app.delete("/ideas/:id", (req, res) => {
-  Idea.remove({ _id: req.params.id }).then(() => {
-    req.flash("success_msg", "Note removed");
-    res.redirect("/ideas");
-  });
-});
-
-//Edit form process
-app.put("/ideas/:id", (req, res) => {
-  res.send("PUT");
-  console.log("sure");
-});
+//Use Notes routes
+app.use("/users", users);
 
 app.listen(port, () => {
   console.log(`App is available on http://localhost:${port}`);

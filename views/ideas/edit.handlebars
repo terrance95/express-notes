@@ -1,4 +1,4 @@
-<h1>Edit Ideas</h1>
+<h1>Edit Notes</h1>
 {{#each errors }}
 <div class="alert alert-danger">
     {{text}}
@@ -8,7 +8,7 @@
 {{/each}}
 <div class="card card-body">
     <h3>Notes</h3>
-    <form action="/ideas/{{idea.id}}?_method=PUT" method="post">
+    <form action="/notes/{{idea.id}}?_method=PUT" method="post">
         <input type="hidden" name="_method" value="PUT">
         <div class="form-group">
             <label for="title">Title</label>
